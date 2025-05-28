@@ -29,3 +29,6 @@ def CrossEntroyLoss(vec : np.ndarray, goal : np.ndarray, deriv = False, pfunc = 
 
     else:
         return -np.sum(goal * np.log(output))
+    
+if __name__ == '__main__':
+    pass

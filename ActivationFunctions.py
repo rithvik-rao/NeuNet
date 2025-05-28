@@ -40,3 +40,7 @@ def Softmax(vec):
     vec_shifted = vec - np.max(vec)
     exp_vec = np.exp(vec_shifted)
     return exp_vec / np.sum(exp_vec)
+
+if __name__ == '__main__':
+
+    pass

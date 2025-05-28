@@ -226,23 +226,19 @@ if __name__ == '__main__': # Just a DUMMY code to check if the above functions a
 
     i feel that this method is more interesting to check the functions compared to the basic XOR problem
     '''
-    # def f(vec):
-
-    #     vec2 = np.sort(vec)
-
-    #     p = [np.where(vec == vec2[-1])[0][0],np.where(vec == vec2[-2])[0][0]]
-
-    #     if set(p) == {0,2} or set(p) == {1,4}:
-
-    #         return np.array([[1],[0]])
-        
-    #     else:
-
-    #         return np.array([[0],[1]])
-
     def f(vec):
 
-        return vec**2
+        vec2 = np.sort(vec)
+
+        p = [np.where(vec == vec2[-1])[0][0],np.where(vec == vec2[-2])[0][0]]
+
+        if set(p) == {0,2} or set(p) == {1,4}:
+
+            return np.array([[1],[0]])
+        
+        else:
+
+            return np.array([[0],[1]])
     
     # def u(vec , deriv = False):
 
