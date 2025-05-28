@@ -5,52 +5,6 @@ from LossFunctions import *
 
 #Classes
 
-class Data():
-
-    '''
-
-    --Things TO DO--
-    
-        - Single matrix form of epoch data has to be summed along a specific axis (1)
-    
-        - the data Array must contain the expected output within it to stay with the corresponding data after shuffling
-    
-    --S U MM A R Y--
-    
-        - Handle the data and labels carefully
-    '''
-
-    def __init__(self, dataArray, trainDataSize = None, shuffle = True):
-        
-        self.dataArray = np.random.shuffle(dataArray)
-
-        if trainDataSize < len(dataArray)/2:
-
-            print('CAUTION!!! --- train data is less than test data')
-
-            check = input('Proceed (Y/N) : ')
-
-            if check.capitalize() == 'Y':
-                pass
-            else:
-                quit('User Exit')
-
-        self.trainDataArray = self.dataArray[0:trainDataSize]
-        self.testDataArray = self.dataArray[trainDataSize:]
-
-        self.trainBatches = None
-        self.testBatches = None
-
-    def CreateBatches(self, batchSize = 1, singleMatrix = True):
-
-        if singleMatrix:
-            self.trainBatches = np.array([self.trainDataArray[i:batchSize*i].T for i in len(self.trainDataArray)/batchSize])
-            self.testBatches = np.array([self.testDataArray[i:batchSize*i].T for i in len(self.testDataArray)/batchSize])
-        else:
-            self.trainBatches = np.array([self.trainDataArray[i:batchSize*i] for i in len(self.trainDataArray)/batchSize])
-            self.testBatches = np.array([self.testDataArray[i:batchSize*i] for i in len(self.testDataArray)/batchSize])
-
-
 class InputLayer():
 
     def __init__(self, size : int):
