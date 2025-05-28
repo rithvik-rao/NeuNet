@@ -1,77 +1,7 @@
 import numpy as np
 import json
-
-#Cost Functions
-
-def MSE(vec : np.ndarray, goal : np.ndarray, deriv = False):
-
-    p = goal - vec
-
-    if deriv:
-        return -2*p/len(p)
-    
-    else:
-        return np.sum(p**2) / len(p)
-    
-def CrossEntroyLoss(vec : np.ndarray, goal : np.ndarray, deriv = False, pfunc = None):
-
-    epsilon = 1e-15
-    output = np.clip(vec, epsilon, 1 - epsilon)
-
-    if deriv:
-
-        if pfunc.__name__ == 'Softmax':
-
-            return output - goal
-        
-        else:
-
-            quit('Derivative not defined yet .!..!...!....')
-
-    else:
-        return -np.sum(goal * np.log(output))
-
-
-#defining activation functions
-
-def ReLU(vec, deriv = False):
-    
-    # p = np.sign(np.sign(vec+1))
-
-    if deriv:
-        return (vec > 0).astype(float)
-    else:
-        return np.maximum(0,vec)
-
-def Sigmoid(vec, deriv = False):
-
-    p = 1/(1+np.exp(-vec))
-
-    if deriv:
-        return p*(1-p)
-    else:
-        return p
-    
-def tanh(vec, deriv = False):
-
-    if deriv:
-        return  np.cosh(vec)**(-2)
-    
-    else:
-        return np.tanh(vec)
-    
-def linear(vec, deriv = False):
-
-    if deriv:
-        return np.ones_like(vec)
-    else:
-        return vec
-
-def Softmax(vec):
-
-    vec_shifted = vec - np.max(vec)
-    exp_vec = np.exp(vec_shifted)
-    return exp_vec / np.sum(exp_vec)
+from ActivationFunctions import *
+from LossFunctions import *
 
 #Classes
 
