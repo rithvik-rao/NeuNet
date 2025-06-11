@@ -117,8 +117,8 @@ class Network():
 
             return self.layers[-1].output
         except ValueError:
-
-            quit('---------------------------------\nDimension mismatch !!! \nPlease check the input array size\n---------------------------------')
+            
+            quit('-----------------------------------------\n    Dimension mismatch !!! \n    Please check the input array size\n-----------------------------------------')
     
     def FeedEpochs(self):
         
