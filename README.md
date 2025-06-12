@@ -8,6 +8,8 @@ My own library for deep neural networks
 - LossFunctions.py
 - NeuralNEtworkFunctions.py
 
+****
+
 ### ActivationFunctions.py
 
 This file contains all the built-in activation functions and their derivatives
@@ -16,13 +18,12 @@ This file contains all the built-in activation functions and their derivatives
 
 ```python
 
-def Function(input, '''any other parameters''', deriv = False):
+def Function(input, '''any other parameters''', deriv = False): # input can be a numpy array
     if deriv:
         #derivative computation
         return ... #output
     else:
         #computation of your function
-
         return ... #output
 ```
 
@@ -41,10 +42,24 @@ def ReLU(vec, deriv = False):
 
 **Built-in Functions**
 
-- Sigmoid
 - ReLU
-- tanh
-- linear
-- Softmax
+- Sigmoid
+- Tanh
+- Linear
+- Softmax (no derivative defined)
 
-more to come :smiley:
+..... more to come :smiley:
+
+![Graphs of the above functions from -5 to 5](./ActivationFunctionsPlotted.png)
+
+***NOTE** : Softmax function here takes*
+>xs = np.linspace(-5,5,100)
+
+*as input* 
+
+****
+
+### DataClass.py
+
+This is a module for ordering and batch division of data arrays
+

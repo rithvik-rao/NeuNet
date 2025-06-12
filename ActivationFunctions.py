@@ -20,7 +20,7 @@ def Sigmoid(vec, deriv = False):
     else:
         return p
     
-def tanh(vec, deriv = False):
+def Tanh(vec, deriv = False):
 
     if deriv:
         return  np.cosh(vec)**(-2)
@@ -28,7 +28,7 @@ def tanh(vec, deriv = False):
     else:
         return np.tanh(vec)
     
-def linear(vec, deriv = False):
+def Linear(vec, deriv = False):
 
     if deriv:
         return np.ones_like(vec)
@@ -43,4 +43,28 @@ def Softmax(vec):
 
 if __name__ == '__main__':
 
-    pass
+    import matplotlib.pyplot as plt
+    
+    funx = [item for item in globals().values() if callable(item)]
+
+    xs = np.linspace(-5,5,100)
+
+    fig, ax = plt.subplots(int(0.5*len(funx)+1) , 2 , figsize = (5,6) ,sharex=True, facecolor = '#111111')
+    i,j =0,0
+
+    for func in funx:
+
+        ax[j][i].set_facecolor('#000000')
+        ax[j][i].plot(xs,func(xs),c='w')
+        ax[j][i].set_title(func.__name__ , c='w')
+        ax[j][i].grid(True)
+
+        i += 1
+
+        if i == 2:
+            j += 1
+            i = 0
+    
+    ax[-1][-1].set_facecolor('#111111')
+
+    plt.savefig('ActivationFunctionsPlotted.png')
