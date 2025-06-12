@@ -47,4 +47,4 @@ def ReLU(vec, deriv = False):
 - linear
 - Softmax
 
-more to come :joy:
+more to come :smiley:
