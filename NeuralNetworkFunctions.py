@@ -1,7 +1,7 @@
 import numpy as np
 import json
-from ActivationFunctions import *
-from LossFunctions import *
+from .ActivationFunctions import *
+from .LossFunctions import *
 
 #Classes
 
