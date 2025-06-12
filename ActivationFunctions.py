@@ -55,9 +55,11 @@ if __name__ == '__main__':
     for func in funx:
 
         ax[j][i].set_facecolor('#000000')
+        ax[j][i].set_yticks([-10,0,10])
+        ax[j][i].set_xticks([-10,0,10])
         ax[j][i].plot(xs,func(xs),c='w')
         ax[j][i].set_title(func.__name__ , c='w')
-        ax[j][i].grid(True)
+        ax[j][i].grid(True,which = 'major')
 
         i += 1
 

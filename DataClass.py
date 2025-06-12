@@ -72,8 +72,8 @@ class Data():
 
     def CreateBatches(self, batchSize = 1):
 
-        self.trainBatches = np.array([self.trainDataArray[i * batchSize : (i + 1) * batchSize] for i in range(int(len(self.trainDataArray)/batchSize)+1)] , dtype=object)
-        self.testBatches = np.array([self.testDataArray[i * batchSize : (i + 1) * batchSize] for i in range(int(len(self.testDataArray)/batchSize)+1)] , dtype=object)
+        self.trainBatches = np.array([self.trainDataArray[i * batchSize : (i + 1) * batchSize] for i in range(int(len(self.trainDataArray)/batchSize))] , dtype=object)
+        self.testBatches = np.array([self.testDataArray[i * batchSize : (i + 1) * batchSize] for i in range(int(len(self.testDataArray)/batchSize))] , dtype=object)
 
     def GiveNextBatch(self, Test = False):
         if Test:
@@ -100,3 +100,25 @@ class Data():
 
         self.currentTrainBatchId = 0
         self.currentTestBatchId = 0
+
+if __name__ == "__main__":
+
+    '''the follwing dataArray has no meaning'''
+    dataArray = np.random.uniform(size = (10,5))
+    dataArray[:,0] = [1,6,7,5,8,4,5,5,9,0]
+
+    data = Data(dataArray=dataArray,labelEndsAt=0,trainDataSize=0.6,shuffle=True) #trainDataSize must be between 0 and 1
+
+    print('Train Data Generated \n',data.trainDataArray, end ='\n\n')
+    print('Test Data Generated \n',data.testDataArray, end ='\n\n')
+
+    data.CreateBatches(batchSize=2)
+
+    print('Train Batches \n', data.trainBatches , end = '\n\n')
+    print('Test Batches \n', data.testBatches , end = '\n\n')
+
+    print('first batch :')
+    print('labels :\n' ,data.GiveNextBatch()[0] , end = '\n\n')
+    print('data :\n' ,data.GiveNextBatch()[1] , end = '\n\n')
+
+    # data.ResetOrder() #can be used to reset the GiveNextBatch function
