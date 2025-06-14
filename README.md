@@ -71,6 +71,8 @@ the above sets can be further split into batches of desired sizes using the abov
 Example code:
 
 ```python
+import numpy as np
+from DataClass import *
 
 '''the follwing dataArray has no meaning'''
 dataArray = np.random.uniform(size = (10,5))
@@ -138,4 +140,74 @@ data :
  [0.16869786560468758 0.8004910266279224 0.21502783576899043 0.8044451310200283]]
   ```
 
-To be added : csv, tsv and json data array input compatibility
+*To be added : csv, tsv and json data array input compatibility*
+
+***
+
+### LossFunctions.py
+
+This is a module for built-in Loss functions with their derivatives.
+
+Similar to Activation functions, user defined loss functions can also be used in the given format
+
+```python
+def UserDefined(vec : np.ndarray, goal : np.ndarray, deriv = False ,*args):
+
+    #code
+
+    if deriv:
+        #computaion of derivative
+        return #output
+    
+    else:
+        #computaion of loss function
+        return #output
+```
+
+***Note :** if the derivative computation requires the activation function used then add a parameter indicating the same (given in example code)*
+
+Here is an example from the built-in functions
+
+```python
+def CrossEntroyLoss(vec : np.ndarray, goal : np.ndarray, deriv = False, pfunc = None):
+
+    epsilon = 1e-15
+    output = np.clip(vec, epsilon, 1 - epsilon)
+
+    if deriv:
+
+        if pfunc.__name__ == 'Softmax':
+
+            return output - goal
+        
+        else:
+
+            quit('Derivative not defined yet .!..!...!....')
+
+    else:
+        return -np.sum(goal * np.log(output))
+
+```
+
+Built-in Loss functions:
+
+- MSE *(Mean Squared Error)*
+- CrossEntropyLoss
+
+..... more to come :smiley:
+
+***
+
+### NeuralNetworkFunctions.py
+
+NOTE : The code is explained clearly in [NNF.md](NNF.md) file
+
+This is the main file containing all the classes needed to construct a Neural Network.
+
+Classes : 
+- Input Layer
+- Layer *(hidden and output)*
+- Network *(A collection of layer and interactions in between them)*
+
+A Neural Network can be saved into a json file which can be used to recreate the same Network using the command
+>Network.FromJSON(filename)

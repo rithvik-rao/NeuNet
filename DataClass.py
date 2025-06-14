@@ -17,19 +17,6 @@ class SizeException(Exception):
 
 class Data():
 
-    '''
-
-    --Things TO DO--
-    
-        - Single matrix form of epoch data has to be summed along a specific axis (1)
-    
-        - the data Array must contain the expected output within it to stay with the corresponding data after shuffling
-    
-    --S U MM A R Y--
-    
-        - Handle the data and labels carefully
-    '''
-
     def __init__(self, dataArray, labelEndsAt : int, trainDataSize = 0.8, shuffle = True):
 
         if len(dataArray) == 0:
