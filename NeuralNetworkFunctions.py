@@ -213,7 +213,7 @@ if __name__ == '__main__': # Just a DUMMY code to check if the above functions a
 
     filename = 'testData.json'
 
-    Neurals = Network(inputSize, [10,10,outputSize],[Tanh, Tanh, Linear], filename)
+    Neurals = Network(inputSize, [10,10,outputSize],[TanH, TanH, Linear], filename)
 
     for i,t in enumerate(trainingdata):
 

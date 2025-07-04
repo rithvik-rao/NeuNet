@@ -1,3 +1,23 @@
+"""
+
+NeuNet Module for Data Class
+============
+
+Features :
+
+- divide train and test data
+- seperate label and feature vectors
+- create batches
+- Shuffle Order
+- get next datapoint from the dataset via next()
+- Generates Epochs
+
+Todo : 
+
+- Auto generate epoch on exhaution of previous one untill epoch count is satisfied
+
+"""
+
 import numpy as np
 
 class SizeException(Exception):
@@ -18,6 +38,43 @@ class SizeException(Exception):
 class Data():
 
     def __init__(self, dataArray, labelEndsAt : int, trainDataSize = 0.8, shuffle = True):
+
+        """
+        
+        Data Class compatible with the Neural Network Functions
+
+        Parameters
+        ----------
+
+        dataArray : Array or list of data/samples along with labels
+
+            structure: 
+            - the dataArray must be a nested list or an array
+            - it should be a concatenation of label vector and data vector (input vector)
+            - a template of element of dataArray is given below
+                
+                `[label_1 label_2 ... label_m data_1 data_2 data_3 ... data_n]`
+
+                label vector = `[label_1 label_2 ... label_m]`
+
+                input vector = `[data_1 data_2 data_3 ... data_n]`
+
+            where `k` is the number of data points, `n` is the dimension of data space
+            `m` is the dimension of the label space
+
+        labelEndsAt : The index of last label column i.e. `m-1`
+
+            type : Integer
+
+        trainDataSize : The fraction of the entire data which will be used to create Train data
+
+            Value : between 0 and 1 (Default = 0.8)
+
+        shuffle : Shuffles the data (if set to True) before dividing into train and test arrays
+
+            (Default = false)
+        ----------
+        """
 
         if len(dataArray) == 0:
 
@@ -53,22 +110,77 @@ class Data():
         del trainsize
 
         self.trainBatches = None
-        self.testBatches = None
         self.currentTrainBatchId = 0
         self.currentTestBatchId = 0
 
-    def CreateBatches(self, batchSize = 1):
+        self.test = False
+        self.batchsize : int
 
-        self.trainBatches = np.array([self.trainDataArray[i * batchSize : (i + 1) * batchSize] for i in range(int(len(self.trainDataArray)/batchSize))] , dtype=object)
-        self.testBatches = np.array([self.testDataArray[i * batchSize : (i + 1) * batchSize] for i in range(int(len(self.testDataArray)/batchSize))] , dtype=object)
+    def __str__(self):
+        
+        return 'Data Array :'+'\n'+str(self.dataArray) +'\n'+'Label ends at :'+'\n'+ str(self.labelEndsAt)
 
-    def GiveNextBatch(self, Test = False):
-        if Test:
-            if self.currentTestBatchId >= len(self.testBatches):
+    def NextEpoch(self):
+
+        """
+        
+        Generate a new Epoch of the Dataset
+
+        NOTE : works only if `self.test == False`
+
+        """
+
+        if not self.test:
+
+            np.random.shuffle(self.trainDataArray)
+            self.currentTrainBatchId = 0
+
+            print(self.trainBatches.shape)
+            self.CreateBatches(self.batchsize)
+
+        else:
+
+            raise Exception('mode is set to test')
+
+    def CreateBatches(self, batchSize :int = 1):
+
+        """
+        
+        Creates Batches which are stored in `self.trainBatches` and `self.testbatches`
+
+        Parameters
+        ----------
+
+        batchSize : Determines the size of Batches (Default = 1)
+
+        ----------
+
+        Generates Batches only for train data when self.test = False
+
+        """
+
+        self.batchsize = batchSize
+
+        if not self.test:
+            self.trainBatches = np.array([self.trainDataArray[i * self.batchsize : (i + 1) * self.batchsize] for i in range(int(len(self.trainDataArray)/self.batchsize))] , dtype=object)
+
+    def __next__(self): #GiveNextBatch(self, Test = False)
+
+        """
+
+        Gives next ( `features` , `labels` ) from the current division ( train or test depending upon `self.test` )
+
+        NOTE : raises `StopIteration` when the Epoch/Array is exhausted
+
+        """
+        
+        if self.test:
+
+            if self.currentTestBatchId >= len(self.testDataArray):
 
                 raise StopIteration("End of test batches")
 
-            batch = self.testBatches[self.currentTestBatchId]
+            batch = np.array([self.testDataArray[self.currentTestBatchId]])
             self.currentTestBatchId += 1
         else:
             if self.currentTrainBatchId >= len(self.trainBatches):
@@ -85,6 +197,10 @@ class Data():
     
     def ResetOrder(self):
 
+        """
+        To restart
+        """
+
         self.currentTrainBatchId = 0
         self.currentTestBatchId = 0
 
@@ -95,6 +211,9 @@ if __name__ == "__main__":
     dataArray[:,0] = [1,6,7,5,8,4,5,5,9,0]
 
     data = Data(dataArray=dataArray,labelEndsAt=0,trainDataSize=0.6,shuffle=True) #trainDataSize must be between 0 and 1
+    
+    print(data)
+    data.test = False
 
     print('Train Data Generated \n',data.trainDataArray, end ='\n\n')
     print('Test Data Generated \n',data.testDataArray, end ='\n\n')
@@ -102,10 +221,20 @@ if __name__ == "__main__":
     data.CreateBatches(batchSize=2)
 
     print('Train Batches \n', data.trainBatches , end = '\n\n')
-    print('Test Batches \n', data.testBatches , end = '\n\n')
+    print('Test Batches \n', data.testDataArray , end = '\n\n')
 
     print('first batch :')
-    print('labels :\n' ,data.GiveNextBatch()[0] , end = '\n\n')
-    print('data :\n' ,data.GiveNextBatch()[1] , end = '\n\n')
+    print(next(data) , end = '\n\n')
+
+    data.test = True
+
+    print('data :\n' ,next(data) , end = '\n\n')
+
+    data.t = False
+
+    data.NextEpoch()
+
+    print('Next Epoch Train Batches \n', data.trainBatches , end = '\n\n')
+
 
     # data.ResetOrder() #can be used to reset the GiveNextBatch function

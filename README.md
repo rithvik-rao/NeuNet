@@ -44,7 +44,7 @@ def ReLU(vec, deriv = False):
 
 - ReLU
 - Sigmoid
-- Tanh
+- TanH
 - Linear
 - Softmax (no derivative defined)
 

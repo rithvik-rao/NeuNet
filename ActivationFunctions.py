@@ -1,8 +1,37 @@
+"""
+
+NeuNet Module for various Activation functions
+
+Functions:
+- ReLu
+- Sigmoid
+- TanH
+- Linear
+- Softmax
+
+More to come...
+"""
+
 import numpy as np
 
 #defining activation functions
 
 def ReLU(vec, deriv = False):
+
+    """
+    
+    Rectified Linear Unit (ReLU) function
+
+    Parameters
+    ----------
+
+    vec : input (Scalar Array)
+
+    deriv : derivative flag (default False)
+
+    ----------
+    
+    """
     
     # p = np.sign(np.sign(vec+1))
 
@@ -13,6 +42,21 @@ def ReLU(vec, deriv = False):
 
 def Sigmoid(vec, deriv = False):
 
+    """
+    
+    Sigmoid function
+
+    Parameters
+    ----------
+
+    vec : input (Scalar Array)
+
+    deriv : derivative flag (default False)
+
+    ----------
+    
+    """
+
     p = 1/(1+np.exp(-vec))
 
     if deriv:
@@ -20,8 +64,21 @@ def Sigmoid(vec, deriv = False):
     else:
         return p
     
-def Tanh(vec, deriv = False):
+def TanH(vec, deriv = False):
+    """
+    
+    Tan Hyperbolic (TanH) function
 
+    Parameters
+    ----------
+
+    vec : input (Scalar Array)
+
+    deriv : derivative flag (default False)
+
+    ----------
+    
+    """
     if deriv:
         return  np.cosh(vec)**(-2)
     
@@ -30,12 +87,42 @@ def Tanh(vec, deriv = False):
     
 def Linear(vec, deriv = False):
 
+    """
+    
+    Linear function
+
+    Parameters
+    ----------
+
+    vec : input (Scalar Array)
+
+    deriv : derivative flag (default False)
+
+    ----------
+    
+    """
+
     if deriv:
         return np.ones_like(vec)
     else:
         return vec
 
 def Softmax(vec):
+
+    """
+    
+    Softmax function
+
+    Parameters
+    ----------
+
+    vec : input (Scalar Array)
+
+    ----------
+    
+    derivative depends on loss function used
+
+    """
 
     vec_shifted = vec - np.max(vec)
     exp_vec = np.exp(vec_shifted)
