@@ -14,7 +14,8 @@ Features :
 
 Todo : 
 
-- Auto generate epoch on exhaution of previous one untill epoch count is satisfied
+- Auto generate epoch on exhaution of previous one untill epoch count is satisfied (Done)
+- The output feactures vectors is not compatible with NNF in shape and dtype (Done)
 
 """
 
@@ -111,7 +112,22 @@ class Data():
 
         self.trainBatches = None
         self.currentTrainBatchId = 0
+        """
+        
+        Current Train Batch Index in Current Epoch
+
+            Set value to zero to **restart** the current epoch
+
+        """
         self.currentTestBatchId = 0
+
+        """
+        
+        Current Test Batch Index
+
+            Set value to zero to **restart** the Test Set
+
+        """
 
         self.test = False
         self.batchsize : int
@@ -135,7 +151,6 @@ class Data():
             np.random.shuffle(self.trainDataArray)
             self.currentTrainBatchId = 0
 
-            print(self.trainBatches.shape)
             self.CreateBatches(self.batchsize)
 
         else:
@@ -178,7 +193,7 @@ class Data():
 
             if self.currentTestBatchId >= len(self.testDataArray):
 
-                raise StopIteration("End of test batches")
+                self.NextEpoch()
 
             batch = np.array([self.testDataArray[self.currentTestBatchId]])
             self.currentTestBatchId += 1
@@ -194,6 +209,10 @@ class Data():
         labels = batch[:, self.labelEndsAt + 1:]
         
         return features, labels
+    
+    def __iter__(self):
+
+        return self
     
     def ResetOrder(self):
 

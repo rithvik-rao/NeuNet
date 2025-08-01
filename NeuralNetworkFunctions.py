@@ -1,7 +1,8 @@
 import numpy as np
 import json
-from .ActivationFunctions import *
-from .LossFunctions import *
+from .ActivationFunctions import Sigmoid
+from .LossFunctions import MSE, CrossEntroyLoss
+from .OneHot import Label
 
 #Classes
 
@@ -15,7 +16,11 @@ class InputLayer():
 
     def GiveInput(self, inputs : np.ndarray):
 
-        self.output = inputs  
+        self.output = inputs
+
+    def __str__(self):
+        
+        return 'input size :'+str(self.size)
 
 class Layer():
 
@@ -31,7 +36,11 @@ class Layer():
         self.output = None
         self.biasGradient = np.zeros_like(self.biases)
         self.weightGradient = np.zeros_like(self.weights)
-        self.epochcount = 0
+        self.batchcount = 0
+
+    def __str__(self):
+        
+        return 'size :'+str(self.size)+'\n'+'Activation Function :'+self.activationFunction.__name__
 
     def Evaluate(self):
 
@@ -42,8 +51,6 @@ class Layer():
     def BackPropLayer(self):
 
         #back propagation must run only after evaluation
-
-        self.epochcount += 1
 
         if self.activationFunction.__name__ == 'Softmax':
 
@@ -58,12 +65,10 @@ class Layer():
         
         self.weightGradient += (self.biasGradient @ self.input.T)
 
-    def UpdateParameters(self, mutationFactor : float):
+    def UpdateParameters(self, mutationFactor : float , batchsize):
 
-        self.weights -= mutationFactor * self.weightGradient/self.epochcount
-        self.biases -= mutationFactor * self.biasGradient/self.epochcount
-
-        self.epochcount = 0
+        self.weights -= mutationFactor * self.weightGradient/batchsize
+        self.biases -= mutationFactor * self.biasGradient/batchsize
 
 class Network():
 
@@ -98,6 +103,14 @@ class Network():
             self.layers.append(layer)
             prevLayer = layer
 
+    def __str__(self):
+        
+        for layer in self.layers:
+
+            print(layer)
+
+        return ''
+
     @classmethod
     def FromJSON(classname, filename):
 
@@ -120,11 +133,19 @@ class Network():
             
             quit('-----------------------------------------\n    Dimension mismatch !!! \n    Please check the input array size\n-----------------------------------------')
     
-    def FeedEpochs(self):
+    def FeedBatches(self , batch , costFunction = MSE, LabelFunction = Label, mutationFactor : float = 10e-3):
         
-        pass
+        for l,sample in zip(batch[1],batch[0]):
+
+            output = self.ForProp(sample.reshape(-1,1))
+            goal = LabelFunction(l , output.shape)
+            loss = self.BackProp(output, goal, costFunction)
+
+        self.UpdateAllParameters(mutationFactor, len(batch[0]))
+
+        return loss
     
-    def BackProp(self, output, goal, costFunction = MSE):
+    def BackProp(self, output, goal, costFunction):
 
         if costFunction == CrossEntroyLoss:
 
@@ -140,11 +161,11 @@ class Network():
 
         return costFunction(output , goal)
 
-    def UpdateAllParameters(self, mutationFactor : float):
+    def UpdateAllParameters(self, mutationFactor : float, batchsize : int):
 
         for layer in self.layers:
 
-            layer.UpdateParameters(mutationFactor)
+            layer.UpdateParameters(mutationFactor, batchsize)
 
     def SaveToJSON(self):
 
@@ -180,6 +201,10 @@ if __name__ == '__main__': # Just a DUMMY code to check if the above functions a
 
     i feel that this method is more interesting to check the functions compared to the basic XOR problem
     '''
+
+    from .ActivationFunctions import TanH, Linear
+
+
     def f(vec):
 
         vec2 = np.sort(vec)
