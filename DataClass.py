@@ -131,6 +131,7 @@ class Data():
 
         self.test = False
         self.batchsize : int
+        self.epochcount = 0
 
     def __str__(self):
         
@@ -147,6 +148,8 @@ class Data():
         """
 
         if not self.test:
+
+            self.epochcount += 1
 
             np.random.shuffle(self.trainDataArray)
             self.currentTrainBatchId = 0
@@ -177,7 +180,10 @@ class Data():
         self.batchsize = batchSize
 
         if not self.test:
-            self.trainBatches = np.array([self.trainDataArray[i * self.batchsize : (i + 1) * self.batchsize] for i in range(int(len(self.trainDataArray)/self.batchsize))] , dtype=object)
+            _l = int(len(self.trainDataArray)/self.batchsize)
+            self.trainBatches = np.array([self.trainDataArray[i * self.batchsize : (i + 1) * self.batchsize] for i in range(_l)])
+            
+
 
     def __next__(self): #GiveNextBatch(self, Test = False)
 
@@ -193,20 +199,20 @@ class Data():
 
             if self.currentTestBatchId >= len(self.testDataArray):
 
-                self.NextEpoch()
+                raise StopIteration('Test Data Exhausted')
 
             batch = np.array([self.testDataArray[self.currentTestBatchId]])
             self.currentTestBatchId += 1
         else:
             if self.currentTrainBatchId >= len(self.trainBatches):
                 
-                raise StopIteration("End of training batches")
+                self.NextEpoch()
 
             batch = self.trainBatches[self.currentTrainBatchId]
             self.currentTrainBatchId += 1
 
-        features = batch[:, :self.labelEndsAt + 1]
-        labels = batch[:, self.labelEndsAt + 1:]
+        labels = batch[:, :self.labelEndsAt + 1]
+        features = batch[:, self.labelEndsAt + 1:]
         
         return features, labels
     

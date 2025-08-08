@@ -1,8 +1,8 @@
 import numpy as np
 import json
-from .ActivationFunctions import Sigmoid
-from .LossFunctions import MSE, CrossEntroyLoss
-from .OneHot import Label
+from ActivationFunctions import Sigmoid
+from LossFunctions import MSE, CrossEntropyLoss
+from LabelFunctions import Label
 
 #Classes
 
@@ -24,7 +24,7 @@ class InputLayer():
 
 class Layer():
 
-    def __init__(self, size : int, biases : np.ndarray, weights : np.ndarray, prevLayer : object, activationFunction = Sigmoid): #All inputs must be in their datatype
+    def __init__(self, size : int, biases : np.ndarray, weights : np.ndarray, prevLayer : any, activationFunction = Sigmoid): #All inputs must be in their datatype
         self.size = size
         self.biases = biases
         self.weights = weights
@@ -40,7 +40,7 @@ class Layer():
 
     def __str__(self):
         
-        return 'size :'+str(self.size)+'\n'+'Activation Function :'+self.activationFunction.__name__
+        return 'size :'+str(self.size)+'\n \t'+'Activation Function :'+self.activationFunction.__name__
 
     def Evaluate(self):
 
@@ -72,7 +72,7 @@ class Layer():
 
 class Network():
 
-    def __init__(self, inputSize, hiddenLayerSizes, activationFunctions, filename, randomize = False ): #parameters should be a json file name of the appropriate format
+    def __init__(self, inputSize, hiddenLayerSizes, activationFunctions, filename = '__model.json', randomize = False ): #parameters should be a json file name of the appropriate format
         
         self.inputLayer = InputLayer(inputSize)
         self.fileName = filename
@@ -92,7 +92,7 @@ class Network():
 
             else:
 
-                self.File = open(self.fileName, 'r+')
+                self.File = open(self.fileName, 'w+')
 
                 loadedData = json.load(self.File)
                 biases = np.array(loadedData[str(i)]["biases"])
@@ -104,12 +104,14 @@ class Network():
             prevLayer = layer
 
     def __str__(self):
+
+        __outstr = 'Input Layer : \n \t' + str(self.inputLayer) + '\n--------------------------------\n'
         
         for layer in self.layers:
 
-            print(layer)
+            __outstr += 'Layer '+ str(self.layers.index(layer)) +'\n \t' + str(layer) + '\n--------------------------------\n'
 
-        return ''
+        return __outstr.strip()
 
     @classmethod
     def FromJSON(classname, filename):
@@ -117,11 +119,12 @@ class Network():
         with open(filename, 'r') as f:
 
             Hyperparameters = json.load(f)
+            print(Hyperparameters['Hyperparameters'])
             activationFuncs = [globals()[func] for func in Hyperparameters['Hyperparameters']['activationFunctions']]
 
         return classname(Hyperparameters['Hyperparameters']['inputLayerSize'], Hyperparameters['Hyperparameters']['hiddenLayerSizes'], activationFuncs, filename)
 
-    def ForProp(self, inputs):
+    def ForProp(self, inputs : np.ndarray):
         try:
             self.inputLayer.GiveInput(inputs)
             for layer in self.layers:
@@ -130,15 +133,15 @@ class Network():
 
             return self.layers[-1].output
         except ValueError:
-            
-            quit('-----------------------------------------\n    Dimension mismatch !!! \n    Please check the input array size\n-----------------------------------------')
-    
+
+            quit('--------------------------------------------------------\n    Dimension mismatch while forward propagation !!! \n    Please check the input array size\n--------------------------------------------------------')
+
     def FeedBatches(self , batch , costFunction = MSE, LabelFunction = Label, mutationFactor : float = 10e-3):
         
-        for l,sample in zip(batch[1],batch[0]):
+        for sample,l in zip(batch[1],batch[0]):
 
             output = self.ForProp(sample.reshape(-1,1))
-            goal = LabelFunction(l , output.shape)
+            goal = LabelFunction(l.reshape(-1,1) , output.shape)
             loss = self.BackProp(output, goal, costFunction)
 
         self.UpdateAllParameters(mutationFactor, len(batch[0]))
@@ -147,7 +150,7 @@ class Network():
     
     def BackProp(self, output, goal, costFunction):
 
-        if costFunction == CrossEntroyLoss:
+        if costFunction == CrossEntropyLoss:
 
             self.layers[-1].aGradient = costFunction(output , goal, deriv = True, pfunc = self.activationFuncs[-1])
 
@@ -202,7 +205,8 @@ if __name__ == '__main__': # Just a DUMMY code to check if the above functions a
     i feel that this method is more interesting to check the functions compared to the basic XOR problem
     '''
 
-    from .ActivationFunctions import TanH, Linear
+    from ActivationFunctions import ReLU, Softmax
+    from DataClass import Data
 
 
     def f(vec):
@@ -229,36 +233,42 @@ if __name__ == '__main__': # Just a DUMMY code to check if the above functions a
     # np.random.seed(0)
 
     N = 100000
-    inputSize = 1
-    outputSize = 1
+    inputSize = 4
+    outputSize = 2
 
     trainingdata = np.random.randn(N, inputSize)
 
-    expectedoutputs = [f(v) for v in trainingdata]
+    expectedoutputs = np.array([f(v).T[0] for v in trainingdata])
 
     filename = 'testData.json'
 
-    Neurals = Network(inputSize, [10,10,outputSize],[TanH, TanH, Linear], filename)
+    Neurals = Network(inputSize, [10,10,outputSize],[ReLU, ReLU, Softmax], filename, True)
 
-    for i,t in enumerate(trainingdata):
+    DataLoader = Data(np.concatenate((expectedoutputs , trainingdata), axis=1), 1, 0.8, True)
 
-        # Neurals.layers[1].
+    DataLoader.CreateBatches(5)
 
-        input_vec = t.reshape(-1, 1)
-        output = Neurals.ForProp(input_vec)
-        Neurals.BackProp(output, expectedoutputs[i])
-        Neurals.UpdateAllParameters(0.01)
+    for batch in DataLoader:
 
-    Neurals.SaveToJSON()
+        Neurals.FeedBatches(batch, CrossEntropyLoss)
 
     z = 0
 
-    for i,t in enumerate(trainingdata):
+    DataLoader.test = True
 
-        input_vec = t.reshape(-1, 1)
+    for sample in DataLoader:
+
+        input_vec = sample[0].reshape(-1, 1)
         output = Neurals.ForProp(input_vec)
 
-        if abs(output[0][0] - expectedoutputs[i][0]) < 0.01:
+        if abs(output - sample[1].reshape(-1,1)) < 0.01:
             z += 1
 
     print(100*z/N , '%', 'accuracy')
+
+
+    Neurals.SaveToJSON()
+
+    Neurals = Network.FromJSON(filename)
+
+    print(Neurals)

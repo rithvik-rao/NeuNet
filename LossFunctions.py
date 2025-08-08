@@ -40,7 +40,7 @@ def MSE(vec : np.ndarray, goal : np.ndarray, deriv = False):
     else:
         return np.sum(p**2) / len(p)
     
-def CrossEntroyLoss(vec : np.ndarray, goal : np.ndarray, deriv = False, pfunc = None):
+def CrossEntropyLoss(vec : np.ndarray, goal : np.ndarray, deriv = False, pfunc = None):
 
     """
     
